@@ -15,10 +15,10 @@ jobs:
     strategy:
       matrix:
         registry: ["ghcr.io"]
-        image-name: ["${{ github.repository }}/test-ee"]
+        image-name: ["${{ github.repository }}/test-ee-1"]
         poetry-version: ["1.6.1"]
         python-version: ["3.9.16"]
-        working-directory: ["ees/test-ee"]
+        working-directory: ["ees/test-ee-1"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

@@ -1,12 +1,12 @@
-name: Build EE
+name: Build, push, test EE
 
 on:
   push:
     branches: [main]
 
 jobs:
-  build:
-    name: Build EE
+  build-push-test:
+    name: Build, push, test EE
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -68,6 +68,8 @@ jobs:
       - name: Build EE with ansible-navigator
         if: matrix.image.build-with == 'ansible-navigator'
         working-directory: ${{ matrix.image.working-directory }}
+        env:
+          TERM: xterm256color
         run: |
           echo "::group::Build EE"
           poetry run \
@@ -77,20 +79,30 @@ jobs:
               --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
           echo "::endgroup::"
-        env:
-          TERM: xterm256color
 
-      - name: Login to ${{ matrix.registry }} Registry
+      - name: Login to ${{ matrix.image.registry }} Registry
         uses: docker/login-action@v2
         with:
           registry: ${{ matrix.image.image-registry }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Push EE
-        working-directory: ${{ matrix.working-directory }}
+      - name: Test EE with ansible-navigator
+        working-directory: ${{ matrix.image.working-directory }}
         run: |
           echo "::group::Push EE"
           docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
           docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }}
+          echo "::endgroup::"
+
+      - name: Test EE
+        working-directory: ${{ matrix.image.working-directory }}
+        env:
+          TERM: xterm256color
+        run: |
+          echo "::group::Test EE"
+          poetry run \
+            ansible-navigator run \
+              --execution-environment-image ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
+              test.yml --verbose
           echo "::endgroup::"

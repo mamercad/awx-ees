@@ -43,11 +43,12 @@ jobs:
 
       - name: Build EE
         run: |
-          ansible-builder build \
-            --container-runtime docker \
-            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE }} \
-            --verbosity 3
+          poetry run \
+            ansible-builder build \
+              --container-runtime docker \
+              --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+              --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE }} \
+              --verbosity 3
 
       # - name: Log into registry ${{ env.REGISTRY }}
       #   uses: docker/login-action@v2

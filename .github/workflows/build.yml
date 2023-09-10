@@ -37,6 +37,7 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
 
       - name: Poetry install
+        working-directory: ${{ matrix.working-directory }}
         run: |
           poetry install
 

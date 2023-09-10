@@ -20,7 +20,7 @@ additional_build_files:
 
 additional_build_steps:
   prepend_base: |
-    RUN yum -y update
+    RUN yum -y update \
       && yum -y upgrade \
       && yum -y install python39 \
       && yum clean all \

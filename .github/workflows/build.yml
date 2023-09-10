@@ -77,6 +77,8 @@ jobs:
               --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
           echo "::endgroup::"
+        env:
+          TERM: xterm256color
 
       - name: Login to ${{ matrix.registry }} Registry
         uses: docker/login-action@v2

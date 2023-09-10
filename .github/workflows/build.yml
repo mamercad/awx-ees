@@ -73,10 +73,8 @@ jobs:
           poetry run \
             ansible-navigator builder build \
               --container-runtime docker \
-              --container-options \
-                --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
-              --container-options \
-                --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
+              --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
+              --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
           echo "::endgroup::"
 

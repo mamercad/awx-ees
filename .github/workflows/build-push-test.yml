@@ -34,6 +34,12 @@ jobs:
             python-version: "3.9.16"
             working-directory: "ees/test-ee-3"
             build-with: ansible-navigator
+          - image-registry: "ghcr.io"
+            image-name: "${{ github.repository }}/test-ee-4"
+            poetry-version: "1.6.1"
+            python-version: "3.9.16"
+            working-directory: "ees/test-ee-4"
+            build-with: ansible-navigator
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

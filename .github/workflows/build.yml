@@ -24,20 +24,18 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9.16"
+
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "1.6.1"
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9.16"
-          cache: poetry
-
       - name: Poetry
         run: |
-          poetry shell
           poetry install
 
       # - name: Install ansible-builder

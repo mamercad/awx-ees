@@ -13,8 +13,8 @@ jobs:
       packages: write
       id-token: write
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         image:
           - image-registry: "ghcr.io"
             image-name: "${{ github.repository }}/test-ee-1"

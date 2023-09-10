@@ -88,7 +88,6 @@ jobs:
           password: ${{ github.token }}
 
       - name: Test EE with ansible-navigator
-        if: matrix.image.build-with == 'ansible-navigator'
         working-directory: ${{ matrix.image.working-directory }}
         run: |
           echo "::group::Push EE"
@@ -97,6 +96,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Test EE
+        if: matrix.image.build-with == 'ansible-navigator'
         working-directory: ${{ matrix.image.working-directory }}
         env:
           TERM: xterm256color

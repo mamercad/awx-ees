@@ -1,4 +1,4 @@
-name: build
+name: Build EE
 
 on:
   push:
@@ -33,6 +33,10 @@ jobs:
         with:
           python-version: "3.9.16"
           cache: poetry
+
+      - name: Poetry
+        run: |
+          poetry install
 
       # - name: Install ansible-builder
       #   run: pip3 install ansible-builder==3.0.0

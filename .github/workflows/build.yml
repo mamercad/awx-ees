@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}/test-ee
 
 jobs:
   build:
@@ -43,22 +43,25 @@ jobs:
 
       - name: Build EE
         run: |
+          echo "::group::Build EE"
           poetry run \
             ansible-builder build \
               --container-runtime docker \
               --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
               --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE }} \
               --verbosity 3
+          echo "::endgroup::"
 
-      # - name: Log into registry ${{ env.REGISTRY }}
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ${{ env.REGISTRY }}
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to ${{ env.REGISTRY }} Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-
-      # - name: Push AWX EE image
-      #   run: |
-      #     docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest && \
-      #     docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE }}
+      - name: Push EE
+        run: |
+          echo "::group::Push EE"
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DATE }}
+          echo "::endgroup::"

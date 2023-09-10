@@ -14,6 +14,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
+        fail-fast: false
         image:
           - image-registry: "ghcr.io"
             image-name: "${{ github.repository }}/test-ee-1"
@@ -26,6 +27,12 @@ jobs:
             poetry-version: "1.6.1"
             python-version: "3.9.16"
             working-directory: "ees/test-ee-2"
+            build-with: ansible-navigator
+          - image-registry: "ghcr.io"
+            image-name: "${{ github.repository }}/test-ee-3"
+            poetry-version: "1.6.1"
+            python-version: "3.9.16"
+            working-directory: "ees/test-ee-3"
             build-with: ansible-navigator
     steps:
       - name: Checkout repository
@@ -103,7 +110,6 @@ jobs:
         run: |
           echo "::group::Test EE"
           poetry run \
-            ansible-navigator run \
+            ansible-navigator run test.yml --mode stdout \
               --execution-environment-image ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
-              test.yml --verbose
           echo "::endgroup::"

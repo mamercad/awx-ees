@@ -94,7 +94,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Test EE with ansible-navigator
+      - name: Push EE
         working-directory: ${{ matrix.image.working-directory }}
         run: |
           echo "::group::Push EE"
@@ -111,5 +111,5 @@ jobs:
           echo "::group::Test EE"
           poetry run \
             ansible-navigator run test.yml --mode stdout \
-              --execution-environment-image ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
+              --execution-environment-image ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
           echo "::endgroup::"

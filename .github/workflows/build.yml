@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Build EE
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -36,6 +37,7 @@ jobs:
 
       - name: Poetry
         run: |
+          poetry shell
           poetry install
 
       # - name: Install ansible-builder

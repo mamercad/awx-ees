@@ -1,0 +1,27 @@
+---
+version: 3
+
+dependencies:
+  ansible_core:
+    package_pip: ansible-core==2.15.3
+  ansible_runner:
+    package_pip: ansible-runner
+  galaxy: requirements.yml
+  python: requirements.txt
+  # system: bindep.txt
+
+images:
+  base_image:
+    name: quay.io/centos/centos:stream8
+
+additional_build_files:
+  - src: ansible.cfg
+    dest: configs
+
+additional_build_steps:
+  prepend_base: |
+    RUN yum -y update \
+      && yum -y upgrade \
+      && yum -y install python39 \
+      && yum clean all \
+      && rm -rf /var/cache/yum

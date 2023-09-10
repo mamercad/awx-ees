@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "awx-ees"
+version = "0.1.0"
+description = ""
+authors = ["Mark Mercado <mmercado@digitalocean.com>"]
+license = "UNLICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ansible-navigator = { version = "^3.4.2", markers = "platform_system != 'Windows'" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

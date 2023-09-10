@@ -14,11 +14,19 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        registry: ["ghcr.io"]
-        image-name: ["${{ github.repository }}/test-ee-1"]
-        poetry-version: ["1.6.1"]
-        python-version: ["3.9.16"]
-        working-directory: ["ees/test-ee-1"]
+        image:
+          - image-registry: "ghcr.io"
+            image-name: "${{ github.repository }}/test-ee-1"
+            poetry-version: "1.6.1"
+            python-version: "3.9.16"
+            working-directory: "ees/test-ee-1"
+            build-with: ansible-builder
+          - image-registry: "ghcr.io"
+            image-name: "${{ github.repository }}/test-ee-2"
+            poetry-version: "1.6.1"
+            python-version: "3.9.16"
+            working-directory: "ees/test-ee-2"
+            build-with: ansible-navigator
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -29,44 +37,60 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.image.python-version }}
 
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: ${{ matrix.poetry-version }}
+          poetry-version: ${{ matrix.image.poetry-version }}
 
       - name: Poetry install
-        working-directory: ${{ matrix.working-directory }}
+        working-directory: ${{ matrix.image.working-directory }}
         run: |
           poetry install
 
       - name: Get yyymmdd
         run: echo "DATE=$(date +%Y%m%d)" >>$GITHUB_ENV
 
-      - name: Build EE
-        working-directory: ${{ matrix.working-directory }}
+      - name: Build EE with ansible-builder
+        if: matrix.image.build-with == 'ansible-builder'
+        working-directory: ${{ matrix.image.working-directory }}
         run: |
           echo "::group::Build EE"
           poetry run \
             ansible-builder build \
               --container-runtime docker \
-              --tag ${{ matrix.registry }}/${{ matrix.image-name }}:latest \
-              --tag ${{ matrix.registry }}/${{ matrix.image-name }}:${{ env.DATE }} \
+              --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
+              --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
+              --verbosity 3
+          echo "::endgroup::"
+
+      - name: Build EE with ansible-navigator
+        if: matrix.image.build-with == 'ansible-navigator'
+        working-directory: ${{ matrix.image.working-directory }}
+        run: |
+          echo "::group::Build EE"
+          poetry run \
+            ansible-navigator builder build \
+              --container-runtime docker \
+              --container-options \
+                --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
+              --container-options \
+                --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
           echo "::endgroup::"
 
       - name: Login to ${{ matrix.registry }} Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ matrix.registry }}
+          registry: ${{ matrix.image.image-registry }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
       - name: Push EE
         working-directory: ${{ matrix.working-directory }}
         run: |
           echo "::group::Push EE"
-          docker push ${{ matrix.registry }}/${{ matrix.image-name }}:latest
-          docker push ${{ matrix.registry }}/${{ matrix.image-name }}:${{ env.DATE }}
+          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
+          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }}
           echo "::endgroup::"

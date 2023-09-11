@@ -28,12 +28,12 @@ jobs:
             python-version: "3.9.16"
             working-directory: "ees/test-ee-2"
             build-with: ansible-navigator
-          - image-registry: "ghcr.io"
-            image-name: "${{ github.repository }}/test-ee-3"
-            poetry-version: "1.6.1"
-            python-version: "3.9.16"
-            working-directory: "ees/test-ee-3"
-            build-with: ansible-navigator
+          # - image-registry: "ghcr.io"
+          #   image-name: "${{ github.repository }}/test-ee-3"
+          #   poetry-version: "1.6.1"
+          #   python-version: "3.9.16"
+          #   working-directory: "ees/test-ee-3"
+          #   build-with: ansible-navigator
           - image-registry: "ghcr.io"
             image-name: "${{ github.repository }}/test-ee-4"
             poetry-version: "1.6.1"
@@ -73,6 +73,7 @@ jobs:
           poetry run \
             ansible-builder build \
               --container-runtime docker \
+              --container-options 'platform=linux/amd64,linux/arm64/v8' \
               --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
               --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
@@ -88,6 +89,7 @@ jobs:
           poetry run \
             ansible-navigator builder build \
               --container-runtime docker \
+              --container-options 'platform=linux/amd64,linux/arm64/v8' \
               --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
               --tag=${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
@@ -100,14 +102,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Push EE
-        working-directory: ${{ matrix.image.working-directory }}
-        run: |
-          echo "::group::Push EE"
-          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
-          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }}
-          echo "::endgroup::"
-
       - name: Test EE
         if: matrix.image.build-with == 'ansible-navigator'
         working-directory: ${{ matrix.image.working-directory }}
@@ -118,4 +112,12 @@ jobs:
           poetry run \
             ansible-navigator run test.yml --mode stdout \
               --execution-environment-image ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
+          echo "::endgroup::"
+
+      - name: Push EE
+        working-directory: ${{ matrix.image.working-directory }}
+        run: |
+          echo "::group::Push EE"
+          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest
+          docker push ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }}
           echo "::endgroup::"

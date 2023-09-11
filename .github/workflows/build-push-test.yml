@@ -73,7 +73,6 @@ jobs:
           poetry run \
             ansible-builder build \
               --container-runtime docker \
-              --build-args 'platform=linux/amd64,linux/arm64/v8' \
               --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:latest \
               --tag ${{ matrix.image.image-registry }}/${{ matrix.image.image-name }}:${{ env.DATE }} \
               --verbosity 3
